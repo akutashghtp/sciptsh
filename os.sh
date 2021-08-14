@@ -12,4 +12,10 @@ echo "Installing QEMU (2-3m)..."
 ./dist/proot -S . apt install qemu-system-x86 curl -y > /dev/null 2>&1
 qemu-img create -f raw windows.img 500G
 wget windows.iso http://download.microsoft.com/download/F/7/D/F7DF966B-5C40-4674-9A32-D83D869A3244/9600.16384.WINBLUE_RTM.130821-1623_X64FRE_SERVERHYPERCORE_EN-US-IRM_SHV_X64FRE_EN-US_DV5.ISO
+echo "Custom On Google Colab"
+echo Your VNC IP Address:
+curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"tcp:..([^"]*).*/\1/p'
+echo "Note: Use Right-Click Or Ctrl+C To Copy"
+echo "Please Keep Colab Tab Open, Maximum Time 12h"
+./dist/proot -S . qemu-system-x86_64 -net nic -net user,hostfwd=tcp::3389-:3389 -show-cursor -m 4096M -localtime -enable-kvm -cpu host,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time,+nx -M pc -smp cores=4 -vga std -machine type=pc,accel=kvm -usb -device usb-tablet -k en-us -drive file=windows.iso,media=cdrom -drive file=windows.img,format=raw,if=virtio -drive file=virtio-win.iso,media=cdrom -boot c -vnc :0 > /dev/null 2>&1
 
